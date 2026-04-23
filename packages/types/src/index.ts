@@ -47,3 +47,44 @@ export interface User {
   createdAt: string
   updatedAt: string
 }
+
+export interface Condition {
+  id: string
+  questionId: string
+  triggerQuestionId: string
+  triggerValue: string
+}
+
+export interface Question {
+  id: string
+  formId: string
+  order: number
+  type: QuestionType
+  title: string
+  description: string | null
+  required: boolean
+  options: string[]
+  scaleMin: string | null
+  scaleMax: string | null
+  condition: Condition | null
+  createdAt: string
+  updatedAt: string
+}
+
+export interface Form {
+  id: string
+  userId: string
+  title: string
+  description: string | null
+  slug: string
+  status: FormStatus
+  brandColor: string | null
+  logoUrl: string | null
+  welcomeTitle: string | null
+  welcomeMessage: string | null
+  thankYouTitle: string | null
+  thankYouMessage: string | null
+  questions: Question[]
+  createdAt: string
+  updatedAt: string
+}
