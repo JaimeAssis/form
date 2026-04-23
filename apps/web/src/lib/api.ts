@@ -24,3 +24,60 @@ export async function apiFetch<T>(path: string, options?: RequestInit): Promise<
   }
   return res.json()
 }
+
+// ─── Forms ────────────────────────────────────────────────────────────────────
+import type { Form, Question, QuestionType } from '@consorte/types'
+
+export async function getForms(): Promise<Form[]> {
+  return apiFetch<Form[]>('/forms')
+}
+
+export async function getForm(id: string): Promise<Form> {
+  return apiFetch<Form>(`/forms/${id}`)
+}
+
+export async function createForm(data: { title?: string }): Promise<Form> {
+  return apiFetch<Form>('/forms', { method: 'POST', body: JSON.stringify(data) })
+}
+
+export async function updateForm(
+  id: string,
+  data: Partial<Pick<Form, 'title' | 'description' | 'welcomeTitle' | 'welcomeMessage' | 'thankYouTitle' | 'thankYouMessage'>>,
+): Promise<Form> {
+  return apiFetch<Form>(`/forms/${id}`, { method: 'PUT', body: JSON.stringify(data) })
+}
+
+export async function deleteForm(id: string): Promise<void> {
+  return apiFetch<void>(`/forms/${id}`, { method: 'DELETE' })
+}
+
+export async function updateFormStatus(
+  id: string,
+  status: 'PUBLISHED' | 'PAUSED' | 'DRAFT',
+): Promise<Form> {
+  return apiFetch<Form>(`/forms/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) })
+}
+
+// ─── Questions ────────────────────────────────────────────────────────────────
+
+export async function createQuestion(formId: string, type: QuestionType): Promise<Question> {
+  return apiFetch<Question>(`/forms/${formId}/questions`, { method: 'POST', body: JSON.stringify({ type }) })
+}
+
+export async function updateQuestion(
+  formId: string,
+  questionId: string,
+  data: Partial<Pick<Question, 'title' | 'description' | 'required' | 'options' | 'scaleMin' | 'scaleMax'>> & {
+    condition?: { triggerQuestionId: string; triggerValue: string } | null
+  },
+): Promise<Question> {
+  return apiFetch<Question>(`/forms/${formId}/questions/${questionId}`, { method: 'PUT', body: JSON.stringify(data) })
+}
+
+export async function deleteQuestion(formId: string, questionId: string): Promise<void> {
+  return apiFetch<void>(`/forms/${formId}/questions/${questionId}`, { method: 'DELETE' })
+}
+
+export async function reorderQuestions(formId: string, order: string[]): Promise<void> {
+  return apiFetch<void>(`/forms/${formId}/questions/reorder`, { method: 'PATCH', body: JSON.stringify({ order }) })
+}
