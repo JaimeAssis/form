@@ -1,0 +1,155 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id               String    @id @default(uuid())
+  email            String    @unique
+  name             String?
+  avatarUrl        String?
+  plan             Plan      @default(FREE)
+  stripeCustomerId String?   @unique
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  forms    Form[]
+  payments Payment[]
+}
+
+enum Plan {
+  FREE
+  PRO
+  AGENCY
+}
+
+model Form {
+  id              String     @id @default(uuid())
+  userId          String
+  title           String
+  description     String?
+  slug            String     @unique
+  status          FormStatus @default(DRAFT)
+  brandColor      String?
+  logoUrl         String?
+  welcomeTitle    String?
+  welcomeMessage  String?
+  thankYouTitle   String?
+  thankYouMessage String?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  user      User       @relation(fields: [userId], references: [id])
+  questions Question[]
+  responses Response[]
+}
+
+enum FormStatus {
+  DRAFT
+  PUBLISHED
+  PAUSED
+}
+
+model Question {
+  id          String       @id @default(uuid())
+  formId      String
+  order       Int
+  type        QuestionType
+  title       String
+  description String?
+  required    Boolean      @default(false)
+  options     String[]
+  scaleMin    String?
+  scaleMax    String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  form      Form       @relation(fields: [formId], references: [id], onDelete: Cascade)
+  condition Condition?
+}
+
+enum QuestionType {
+  SHORT_TEXT
+  LONG_TEXT
+  MULTIPLE_CHOICE
+  MULTIPLE_SELECT
+  SCALE
+}
+
+model Condition {
+  id                String @id @default(uuid())
+  questionId        String @unique
+  triggerQuestionId String
+  triggerValue      String
+
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+}
+
+model Response {
+  id              String         @id @default(uuid())
+  formId          String
+  respondentName  String?
+  respondentEmail String?
+  status          ResponseStatus @default(UNLOCKED)
+  createdAt       DateTime       @default(now())
+
+  form    Form      @relation(fields: [formId], references: [id])
+  answers Answer[]
+  payment Payment?
+}
+
+enum ResponseStatus {
+  UNLOCKED
+  QUARANTINED
+}
+
+model Answer {
+  id         String @id @default(uuid())
+  responseId String
+  questionId String
+  value      String
+
+  response Response @relation(fields: [responseId], references: [id], onDelete: Cascade)
+}
+
+model Payment {
+  id                    String        @id @default(uuid())
+  userId                String
+  responseId            String?       @unique
+  type                  PaymentType
+  amount                Int
+  status                PaymentStatus @default(PENDING)
+  stripePaymentIntentId String?       @unique
+  createdAt             DateTime      @default(now())
+
+  user     User      @relation(fields: [userId], references: [id])
+  response Response? @relation(fields: [responseId], references: [id])
+}
+
+enum PaymentType {
+  OVERAGE_SINGLE
+  OVERAGE_PACK
+  SUBSCRIPTION
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+}
+
+model Template {
+  id          String   @id @default(uuid())
+  niche       String
+  title       String
+  description String
+  questions   Json
+  order       Int
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+}

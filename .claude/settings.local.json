@@ -7,7 +7,9 @@
       "Bash(node node_modules/.bin/prisma migrate dev --name init)",
       "Bash(node node_modules/prisma/build/index.js migrate dev --name init)",
       "Bash(\"../../node_modules/.bin/prisma\" migrate *)",
-      "Bash(node -e ' *)"
+      "Bash(node -e ' *)",
+      "Bash(\"../../node_modules/.bin/prisma\" validate *)",
+      "Bash(\"node_modules/.bin/prisma\" validate *)"
     ]
   }
 }
