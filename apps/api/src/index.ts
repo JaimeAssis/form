@@ -1,16 +1,20 @@
 import Fastify from 'fastify'
 import cors from '@fastify/cors'
 import 'dotenv/config'
+import { authRoutes } from './routes/auth'
+import { userRoutes } from './routes/users'
 
 const server = Fastify({ logger: true })
 
 server.register(cors, {
   origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  credentials: true,
 })
 
-server.get('/health', async () => {
-  return { status: 'ok', timestamp: new Date().toISOString() }
-})
+server.get('/health', async () => ({ status: 'ok', timestamp: new Date().toISOString() }))
+
+server.register(authRoutes)
+server.register(userRoutes)
 
 const start = async () => {
   try {

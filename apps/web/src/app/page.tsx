@@ -1,8 +1,5 @@
-export default function Home() {
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-24">
-      <h1 className="text-4xl font-bold text-primary">Consorte Form</h1>
-      <p className="mt-4 text-muted-foreground">Fundação pronta. Features em breve.</p>
-    </main>
-  )
+import { redirect } from 'next/navigation'
+
+export default function RootPage() {
+  redirect('/login')
 }

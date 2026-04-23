@@ -34,3 +34,16 @@ export enum PaymentStatus {
   PAID = 'PAID',
   FAILED = 'FAILED',
 }
+
+export interface User {
+  id: string
+  email: string
+  name: string | null
+  slug: string | null
+  niche: string | null
+  avatarUrl: string | null
+  plan: Plan
+  onboardingDone: boolean
+  createdAt: string
+  updatedAt: string
+}

@@ -9,7 +9,9 @@
       "Bash(\"../../node_modules/.bin/prisma\" migrate *)",
       "Bash(node -e ' *)",
       "Bash(\"../../node_modules/.bin/prisma\" validate *)",
-      "Bash(\"node_modules/.bin/prisma\" validate *)"
+      "Bash(\"node_modules/.bin/prisma\" validate *)",
+      "Bash(npx next *)",
+      "Bash(npx tsc *)"
     ]
   }
 }
