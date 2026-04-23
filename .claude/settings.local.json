@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install *)",
+      "Bash(npx prisma *)",
+      "Bash(npm run *)",
+      "Bash(node node_modules/.bin/prisma migrate dev --name init)",
+      "Bash(node node_modules/prisma/build/index.js migrate dev --name init)",
+      "Bash(\"../../node_modules/.bin/prisma\" migrate *)",
+      "Bash(node -e ' *)"
+    ]
+  }
+}
