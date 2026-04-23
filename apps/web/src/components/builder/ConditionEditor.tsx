@@ -54,7 +54,7 @@ export function ConditionEditor({ currentQuestionId, questions, condition, onCha
 
       {condition && triggerQuestion && (
         <div>
-          <Label className="text-xs font-medium text-gray-600 mb-1 block">For igual a:</Label>
+          <Label className="text-xs font-medium text-gray-600 mb-1 block">Valor igual a:</Label>
           <Select
             value={condition.triggerValue}
             onValueChange={(val) => onChange({ ...condition, triggerValue: val })}
