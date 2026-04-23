@@ -4,6 +4,7 @@ import 'dotenv/config'
 import { authRoutes } from './routes/auth'
 import { userRoutes } from './routes/users'
 import { formRoutes } from './routes/forms'
+import { questionRoutes } from './routes/questions'
 
 const server = Fastify({ logger: true })
 
@@ -17,6 +18,7 @@ server.get('/health', async () => ({ status: 'ok', timestamp: new Date().toISOSt
 server.register(authRoutes)
 server.register(userRoutes)
 server.register(formRoutes)
+server.register(questionRoutes)
 
 const start = async () => {
   try {
