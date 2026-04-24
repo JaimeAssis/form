@@ -113,7 +113,8 @@ export async function questionRoutes(app: FastifyInstance) {
       }
     }
 
-    const { condition: _c, ...questionData } = body
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { condition: _, ...questionData } = body
     const updated = await prisma.question.update({
       where: { id: qid },
       data: questionData,
