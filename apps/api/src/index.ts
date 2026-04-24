@@ -5,6 +5,7 @@ import { authRoutes } from './routes/auth'
 import { userRoutes } from './routes/users'
 import { formRoutes } from './routes/forms'
 import { questionRoutes } from './routes/questions'
+import { publicRoutes } from './routes/public'
 
 const server = Fastify({ logger: true })
 
@@ -19,6 +20,7 @@ server.register(authRoutes)
 server.register(userRoutes)
 server.register(formRoutes)
 server.register(questionRoutes)
+server.register(publicRoutes)
 
 const start = async () => {
   try {
