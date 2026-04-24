@@ -1,5 +1,6 @@
 // apps/api/src/services/responseService.ts
 import { prisma } from '../lib/prisma'
+import { Plan } from '@consorte/types'
 
 export async function countMonthlyUnlockedResponses(formId: string): Promise<number> {
   const startOfMonth = new Date()
@@ -17,7 +18,7 @@ export async function countMonthlyUnlockedResponses(formId: string): Promise<num
 
 interface SaveResponseInput {
   formId: string
-  ownerPlan: string
+  ownerPlan: Plan
   respondentName?: string
   respondentEmail?: string
   answers: Array<{ questionId: string; value: string }>

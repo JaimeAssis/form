@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { Plan } from '@consorte/types'
 import { countMonthlyUnlockedResponses, saveResponse } from './responseService'
 
 vi.mock('../lib/prisma', () => ({
@@ -42,7 +43,7 @@ describe('saveResponse', () => {
 
     const result = await saveResponse({
       formId: 'form-1',
-      ownerPlan: 'PRO',
+      ownerPlan: Plan.PRO,
       answers: [{ questionId: 'q-1', value: 'Sim' }],
     })
 
@@ -60,7 +61,7 @@ describe('saveResponse', () => {
 
     await saveResponse({
       formId: 'form-1',
-      ownerPlan: 'AGENCY',
+      ownerPlan: Plan.AGENCY,
       answers: [],
     })
 
@@ -78,7 +79,7 @@ describe('saveResponse', () => {
 
     await saveResponse({
       formId: 'form-1',
-      ownerPlan: 'FREE',
+      ownerPlan: Plan.FREE,
       answers: [{ questionId: 'q-1', value: 'Texto' }],
     })
 
@@ -95,7 +96,7 @@ describe('saveResponse', () => {
 
     await saveResponse({
       formId: 'form-1',
-      ownerPlan: 'FREE',
+      ownerPlan: Plan.FREE,
       answers: [{ questionId: 'q-1', value: 'Texto' }],
     })
 
@@ -111,7 +112,7 @@ describe('saveResponse', () => {
 
     await saveResponse({
       formId: 'form-1',
-      ownerPlan: 'PRO',
+      ownerPlan: Plan.PRO,
       respondentName: 'João Silva',
       respondentEmail: 'joao@exemplo.com',
       answers: [],
@@ -132,7 +133,7 @@ describe('saveResponse', () => {
 
     await saveResponse({
       formId: 'form-1',
-      ownerPlan: 'PRO',
+      ownerPlan: Plan.PRO,
       answers: [
         { questionId: 'q-1', value: 'Sim' },
         { questionId: 'q-2', value: '["Opção 1","Opção 3"]' },

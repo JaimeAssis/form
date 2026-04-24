@@ -7,10 +7,10 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "outDir": "./dist",
-    "rootDir": ".",
+    "baseUrl": "../../",
     "resolveJsonModule": true,
     "paths": {
-      "@consorte/types": ["../../packages/types/src/index.ts"]
+      "@consorte/types": ["packages/types/src/index.ts"]
     }
   },
   "include": ["src", "prisma"],
