@@ -14,7 +14,7 @@ async function getForm(slug: string): Promise<PublicFormData | null | 'paused'> 
       try {
         const data = await res.json()
         if (data.paused) return 'paused'
-      } catch {}
+      } catch (_e) { /* not json */ }
       return null
     }
 
