@@ -1,6 +1,7 @@
 import { FastifyInstance } from 'fastify'
 import { prisma } from '../lib/prisma'
 import { authenticate } from '../middleware/auth'
+import { planGuard } from '../middleware/planGuard'
 
 export async function responseRoutes(app: FastifyInstance) {
   // GET /forms/:id/responses
@@ -112,4 +113,60 @@ export async function responseRoutes(app: FastifyInstance) {
       answers: answersWithInfo,
     })
   })
+
+  // GET /forms/:id/responses/export — Pro/Agência only
+  app.get(
+    '/forms/:id/responses/export',
+    { preHandler: [authenticate, planGuard(['PRO', 'AGENCY'])] },
+    async (request, reply) => {
+      const { id } = request.params as { id: string }
+
+      const form = await prisma.form.findFirst({
+        where: { id, userId: request.userId },
+        include: {
+          questions: { orderBy: { order: 'asc' } },
+          responses: {
+            where: { status: 'UNLOCKED' },
+            include: { answers: true },
+            orderBy: { createdAt: 'desc' },
+          },
+        },
+      })
+      if (!form) return reply.status(404).send({ error: 'Formulário não encontrado' })
+
+      const headers = ['Data', 'Respondente', ...form.questions.map((q) => q.title)]
+      const rows = form.responses.map((r) => {
+        const answerMap = new Map(r.answers.map((a) => [a.questionId, a.value]))
+        return [
+          new Date(r.createdAt).toLocaleString('pt-BR'),
+          r.respondentName ?? 'Anônimo',
+          ...form.questions.map((q) => {
+            const val = answerMap.get(q.id) ?? ''
+            try {
+              const parsed = JSON.parse(val)
+              if (Array.isArray(parsed)) return parsed.join('; ')
+            } catch {
+              // não é JSON
+            }
+            return val
+          }),
+        ]
+      })
+
+      const csvLines = [headers, ...rows]
+        .map((row) =>
+          row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(','),
+        )
+        .join('\r\n')
+
+      const bom = '\uFEFF'
+      const date = new Date().toISOString().slice(0, 10)
+      reply.header('Content-Type', 'text/csv; charset=utf-8')
+      reply.header(
+        'Content-Disposition',
+        `attachment; filename="respostas-${form.title.slice(0, 30)}-${date}.csv"`,
+      )
+      return reply.send(bom + csvLines)
+    },
+  )
 }
