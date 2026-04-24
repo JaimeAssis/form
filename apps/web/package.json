@@ -19,6 +19,8 @@
     "@radix-ui/react-slot": "^1.0.2",
     "@radix-ui/react-switch": "^1.2.6",
     "@radix-ui/react-toast": "^1.1.5",
+    "@stripe/react-stripe-js": "^6.2.0",
+    "@stripe/stripe-js": "^9.3.1",
     "@supabase/ssr": "^0.3.0",
     "@supabase/supabase-js": "^2.39.3",
     "class-variance-authority": "^0.7.0",

@@ -81,3 +81,76 @@ export async function deleteQuestion(formId: string, questionId: string): Promis
 export async function reorderQuestions(formId: string, order: string[]): Promise<void> {
   return apiFetch<void>(`/forms/${formId}/questions/reorder`, { method: 'PATCH', body: JSON.stringify({ order }) })
 }
+
+// ─── Responses ────────────────────────────────────────────────────────────────
+
+export interface ResponseSummary {
+  id: string
+  respondentName: string | null
+  createdAt: string
+  status: 'UNLOCKED' | 'QUARANTINED'
+}
+
+export interface ResponsesMeta {
+  plan: string
+  monthlyFreeUsed: number
+  quarantinedCount: number
+  accumulatedCostCents: number
+}
+
+export interface ResponsesListResult {
+  responses: ResponseSummary[]
+  meta: ResponsesMeta
+}
+
+export interface AnswerWithInfo {
+  questionId: string
+  questionTitle: string
+  questionType: string
+  value: string
+}
+
+export interface ResponseQuestion {
+  id: string
+  title: string
+  type: string
+  order: number
+}
+
+export interface ResponseDetail {
+  id: string
+  respondentName: string | null
+  respondentEmail: string | null
+  createdAt: string
+  status: 'UNLOCKED'
+  questions: ResponseQuestion[]
+  answers: AnswerWithInfo[]
+}
+
+export async function getFormResponses(formId: string): Promise<ResponsesListResult> {
+  return apiFetch<ResponsesListResult>(`/forms/${formId}/responses`)
+}
+
+export async function getResponseById(
+  formId: string,
+  responseId: string,
+): Promise<ResponseDetail> {
+  return apiFetch<ResponseDetail>(`/forms/${formId}/responses/${responseId}`)
+}
+
+// ─── Payments ─────────────────────────────────────────────────────────────────
+
+export async function createOverageIntent(
+  responseId: string,
+): Promise<{ clientSecret: string }> {
+  return apiFetch<{ clientSecret: string }>('/payments/overage/intent', {
+    method: 'POST',
+    body: JSON.stringify({ responseId }),
+  })
+}
+
+export async function createOveragePack(): Promise<{ clientSecret: string }> {
+  return apiFetch<{ clientSecret: string }>('/payments/overage/pack', {
+    method: 'POST',
+  })
+}
