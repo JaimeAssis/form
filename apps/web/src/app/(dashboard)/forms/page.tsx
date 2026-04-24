@@ -6,7 +6,7 @@ import { Form, FormStatus } from '@consorte/types'
 import { getForms, createForm, deleteForm, updateFormStatus } from '@/lib/api'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/use-toast'
-import { Plus, Edit2, Copy, Trash2, Globe, PauseCircle } from 'lucide-react'
+import { Plus, Edit2, Copy, Trash2, Globe, PauseCircle, BarChart2 } from 'lucide-react'
 
 const STATUS_CONFIG: Record<FormStatus, { label: string; className: string }> = {
   [FormStatus.DRAFT]: { label: 'Rascunho', className: 'bg-gray-100 text-gray-600' },
@@ -112,6 +112,9 @@ export default function FormsPage() {
                 </div>
 
                 <div className="flex items-center gap-1">
+                  <Button variant="ghost" size="sm" onClick={() => router.push(`/dashboard/forms/${form.id}/responses`)}>
+                    <BarChart2 className="w-4 h-4" />
+                  </Button>
                   <Button variant="ghost" size="sm" onClick={() => router.push(`/dashboard/forms/${form.id}/edit`)}>
                     <Edit2 className="w-4 h-4" />
                   </Button>
