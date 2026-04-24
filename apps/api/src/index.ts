@@ -8,6 +8,7 @@ import { questionRoutes } from './routes/questions'
 import { publicRoutes } from './routes/public'
 import { responseRoutes } from './routes/responses'
 import { paymentRoutes } from './routes/payments'
+import { subscriptionRoutes } from './routes/subscriptions'
 import { webhookRoutes } from './routes/webhooks'
 
 const server = Fastify({ logger: true })
@@ -26,6 +27,7 @@ server.register(questionRoutes)
 server.register(publicRoutes)
 server.register(responseRoutes)
 server.register(paymentRoutes)
+server.register(subscriptionRoutes)
 // webhookRoutes last: it overrides the JSON parser in its own scope for raw body access
 server.register(webhookRoutes)
 
