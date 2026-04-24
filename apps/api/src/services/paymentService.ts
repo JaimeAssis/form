@@ -1,46 +1,70 @@
 import { stripe } from '../lib/stripe'
 import { prisma } from '../lib/prisma'
 
+const OVERAGE_SINGLE_PRICE_CENTS = 300
+const OVERAGE_PACK_PRICE_CENTS = 2000
+const OVERAGE_PACK_RESPONSE_LIMIT = 20
+
 export async function createOverageIntent(
   userId: string,
   responseId: string,
 ): Promise<{ clientSecret: string }> {
   const intent = await stripe.paymentIntents.create({
-    amount: 300,
+    amount: OVERAGE_SINGLE_PRICE_CENTS,
     currency: 'brl',
     metadata: { responseId, userId, type: 'OVERAGE_SINGLE' },
   })
-  await prisma.payment.create({
-    data: {
-      userId,
-      responseId,
-      type: 'OVERAGE_SINGLE',
-      amount: 300,
-      status: 'PENDING',
-      stripePaymentIntentId: intent.id,
-    },
-  })
-  return { clientSecret: intent.client_secret! }
+
+  try {
+    await prisma.payment.create({
+      data: {
+        userId,
+        responseId,
+        type: 'OVERAGE_SINGLE',
+        amount: OVERAGE_SINGLE_PRICE_CENTS,
+        status: 'PENDING',
+        stripePaymentIntentId: intent.id,
+      },
+    })
+  } catch (err) {
+    await stripe.paymentIntents.cancel(intent.id)
+    throw err
+  }
+
+  if (!intent.client_secret) {
+    throw new Error(`Missing client_secret on PaymentIntent ${intent.id}`)
+  }
+  return { clientSecret: intent.client_secret }
 }
 
 export async function createOveragePack(
   userId: string,
 ): Promise<{ clientSecret: string }> {
   const intent = await stripe.paymentIntents.create({
-    amount: 2000,
+    amount: OVERAGE_PACK_PRICE_CENTS,
     currency: 'brl',
     metadata: { userId, type: 'OVERAGE_PACK' },
   })
-  await prisma.payment.create({
-    data: {
-      userId,
-      type: 'OVERAGE_PACK',
-      amount: 2000,
-      status: 'PENDING',
-      stripePaymentIntentId: intent.id,
-    },
-  })
-  return { clientSecret: intent.client_secret! }
+
+  try {
+    await prisma.payment.create({
+      data: {
+        userId,
+        type: 'OVERAGE_PACK',
+        amount: OVERAGE_PACK_PRICE_CENTS,
+        status: 'PENDING',
+        stripePaymentIntentId: intent.id,
+      },
+    })
+  } catch (err) {
+    await stripe.paymentIntents.cancel(intent.id)
+    throw err
+  }
+
+  if (!intent.client_secret) {
+    throw new Error(`Missing client_secret on PaymentIntent ${intent.id}`)
+  }
+  return { clientSecret: intent.client_secret }
 }
 
 export async function handlePaymentSucceeded(
@@ -73,11 +97,13 @@ export async function handlePaymentSucceeded(
     const quarantined = await prisma.response.findMany({
       where: { formId: { in: formIds }, status: 'QUARANTINED' },
       orderBy: { createdAt: 'asc' },
-      take: 20,
+      take: OVERAGE_PACK_RESPONSE_LIMIT,
     })
-    await prisma.response.updateMany({
-      where: { id: { in: quarantined.map((r) => r.id) } },
-      data: { status: 'UNLOCKED' },
-    })
+    if (quarantined.length > 0) {
+      await prisma.response.updateMany({
+        where: { id: { in: quarantined.map((r) => r.id) } },
+        data: { status: 'UNLOCKED' },
+      })
+    }
   }
 }

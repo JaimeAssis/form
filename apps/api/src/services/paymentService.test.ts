@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 const {
   mockPaymentIntentsCreate,
+  mockPaymentIntentsCancel,
   mockPaymentCreate,
   mockPaymentFindUnique,
   mockPaymentUpdate,
@@ -11,6 +12,7 @@ const {
   mockFormFindMany,
 } = vi.hoisted(() => ({
   mockPaymentIntentsCreate: vi.fn(),
+  mockPaymentIntentsCancel: vi.fn(),
   mockPaymentCreate: vi.fn(),
   mockPaymentFindUnique: vi.fn(),
   mockPaymentUpdate: vi.fn(),
@@ -24,6 +26,7 @@ vi.mock('../lib/stripe', () => ({
   stripe: {
     paymentIntents: {
       create: mockPaymentIntentsCreate,
+      cancel: mockPaymentIntentsCancel,
     },
   },
 }))
@@ -187,7 +190,7 @@ describe('handlePaymentSucceeded', () => {
     })
   })
 
-  it('calls updateMany with empty array when no quarantined responses exist', async () => {
+  it('skips updateMany when no quarantined responses exist for pack', async () => {
     mockPaymentFindUnique.mockResolvedValue({
       id: 'pay-4',
       status: 'PENDING',
@@ -198,13 +201,9 @@ describe('handlePaymentSucceeded', () => {
     mockPaymentUpdate.mockResolvedValue({})
     mockFormFindMany.mockResolvedValue([{ id: 'form-1' }])
     mockResponseFindMany.mockResolvedValue([])
-    mockResponseUpdateMany.mockResolvedValue({})
 
     await handlePaymentSucceeded('pi_pack_empty')
 
-    expect(mockResponseUpdateMany).toHaveBeenCalledWith({
-      where: { id: { in: [] } },
-      data: { status: 'UNLOCKED' },
-    })
+    expect(mockResponseUpdateMany).not.toHaveBeenCalled()
   })
 })
