@@ -4,6 +4,7 @@ import { z } from 'zod'
 import { Plan } from '@consorte/types'
 import { prisma } from '../lib/prisma'
 import { saveResponse } from '../services/responseService'
+import { enqueueNewResponseEmail } from '../services/emailService'
 
 // Rate limiter em memória: máx 10 submissões por IP por hora
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>()
@@ -102,7 +103,7 @@ export async function publicRoutes(app: FastifyInstance) {
           include: { condition: true },
           orderBy: { order: 'asc' },
         },
-        user: { select: { plan: true } },
+        user: { select: { plan: true, email: true } },
       },
     })
 
@@ -133,13 +134,29 @@ export async function publicRoutes(app: FastifyInstance) {
       }
     }
 
-    await saveResponse({
+    const { id: savedResponseId } = await saveResponse({
       formId: form.id,
       ownerPlan: form.user.plan as Plan,
       respondentName: body.respondentName,
       respondentEmail: body.respondentEmail || undefined,
       answers: body.answers,
     })
+
+    if (form.user.plan === 'PRO' || form.user.plan === 'AGENCY') {
+      if (form.user.email) {
+        enqueueNewResponseEmail({
+          to: form.user.email,
+          formTitle: form.title,
+          respondentName: body.respondentName,
+          formId: form.id,
+          responseId: savedResponseId,
+          appUrl: process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000',
+        }).catch((err) => {
+          // Falha silenciosa — não bloqueia resposta do respondente
+          console.error('[emailQueue] falha ao enfileirar e-mail:', err)
+        })
+      }
+    }
 
     return reply.status(200).send({ ok: true })
   })
