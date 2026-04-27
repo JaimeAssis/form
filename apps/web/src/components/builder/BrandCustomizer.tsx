@@ -1,5 +1,7 @@
 'use client'
 
+import Image from 'next/image'
+
 interface BrandCustomizerProps {
   brandColor: string
   logoUrl: string
@@ -45,7 +47,13 @@ export function BrandCustomizer({ brandColor, logoUrl, isPro, onChange }: BrandC
           className="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
         {logoUrl && (
-          <img src={logoUrl} alt="Logo preview" className="mt-2 h-10 object-contain" />
+          <Image
+            src={logoUrl}
+            alt="Logo preview"
+            width={80}
+            height={40}
+            className="mt-2 h-10 object-contain"
+          />
         )}
       </div>
     </div>

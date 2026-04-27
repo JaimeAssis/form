@@ -11,6 +11,7 @@ import {
 import { PlanCard } from '@/components/upgrade/PlanCard'
 import { useToast } from '@/components/ui/use-toast'
 import { Button } from '@/components/ui/button'
+import { trackEvent } from '@/lib/posthog'
 
 const PLANS = [
   {
@@ -83,6 +84,11 @@ export default function UpgradePage() {
     if (!priceId) return
     setLoading(true)
     try {
+      const matched = PLANS.find((p) => p.priceIdMonthly === priceId || p.priceIdAnnual === priceId)
+      trackEvent('upgrade_started', {
+        toPlan: matched?.plan ?? 'unknown',
+        billing: isAnnual ? 'annual' : 'monthly',
+      })
       const { url } = await createCheckoutSession(priceId)
       window.location.href = url
     } catch {

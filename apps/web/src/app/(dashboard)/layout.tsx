@@ -3,6 +3,7 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { LogoutButton } from '@/components/dashboard/logout-button'
+import { UserIdentifier } from '@/components/UserIdentifier'
 
 async function getUser() {
   const cookieStore = cookies()
@@ -23,10 +24,11 @@ async function getUser() {
 }
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
-  await getUser()
+  const user = await getUser()
 
   return (
     <div className="min-h-screen bg-background">
+      <UserIdentifier userId={user.id} plan={(user.user_metadata?.plan as string) ?? 'free'} nicho={user.user_metadata?.nicho as string | undefined} />
       <header className="border-b">
         <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
           <Link href="/dashboard" className="font-semibold text-primary">

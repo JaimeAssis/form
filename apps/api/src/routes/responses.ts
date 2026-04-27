@@ -169,4 +169,102 @@ export async function responseRoutes(app: FastifyInstance) {
       return reply.send(bom + csvLines)
     },
   )
+
+  // GET /forms/:id/responses/export/pdf — Pro/Agência only
+  app.get(
+    '/forms/:id/responses/export/pdf',
+    { preHandler: [authenticate, planGuard(['PRO', 'AGENCY'])] },
+    async (request, reply) => {
+      const { id } = request.params as { id: string }
+
+      const form = await prisma.form.findFirst({
+        where: { id, userId: request.userId },
+        include: {
+          questions: { orderBy: { order: 'asc' } },
+          responses: {
+            where: { status: 'UNLOCKED' },
+            include: { answers: true },
+            orderBy: { createdAt: 'desc' },
+          },
+        },
+      })
+      if (!form) return reply.status(404).send({ error: 'Formulário não encontrado' })
+
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const PDFDocument = require('pdfkit')
+      const doc = new PDFDocument({ margin: 50, size: 'A4' })
+      const date = new Date().toISOString().slice(0, 10)
+
+      reply.header('Content-Type', 'application/pdf')
+      reply.header(
+        'Content-Disposition',
+        `attachment; filename="respostas-${form.title.slice(0, 30).replace(/[^a-zA-Z0-9]/g, '-')}-${date}.pdf"`,
+      )
+
+      doc.pipe(reply.raw)
+
+      // Cabeçalho
+      doc
+        .fontSize(18)
+        .font('Helvetica-Bold')
+        .text(form.title, { align: 'center' })
+      doc
+        .fontSize(10)
+        .font('Helvetica')
+        .fillColor('#666666')
+        .text(
+          `Exportado em ${new Date().toLocaleDateString('pt-BR')} · ${form.responses.length} respostas`,
+          { align: 'center' },
+        )
+      doc.moveDown(1)
+
+      if (form.responses.length === 0) {
+        doc.fontSize(12).fillColor('#333333').text('Nenhuma resposta desbloqueada encontrada.')
+        doc.end()
+        return reply
+      }
+
+      form.responses.forEach((response, idx) => {
+        if (idx > 0) doc.addPage()
+
+        doc
+          .fontSize(13)
+          .font('Helvetica-Bold')
+          .fillColor('#111111')
+          .text(`Resposta ${idx + 1}: ${response.respondentName ?? 'Anônimo'}`)
+        doc
+          .fontSize(9)
+          .font('Helvetica')
+          .fillColor('#888888')
+          .text(`Recebida em ${new Date(response.createdAt).toLocaleString('pt-BR')}`)
+        doc.moveDown(0.5)
+
+        const answerMap = new Map(response.answers.map((a) => [a.questionId, a.value]))
+
+        form.questions.forEach((q) => {
+          const raw = answerMap.get(q.id) ?? ''
+          let value = raw
+          try {
+            const parsed = JSON.parse(raw)
+            if (Array.isArray(parsed)) value = parsed.join(', ')
+          } catch { /* não é JSON */ }
+
+          doc
+            .fontSize(10)
+            .font('Helvetica-Bold')
+            .fillColor('#333333')
+            .text(q.title, { continued: false })
+          doc
+            .fontSize(10)
+            .font('Helvetica')
+            .fillColor('#555555')
+            .text(value || '(não respondida)', { indent: 16 })
+          doc.moveDown(0.3)
+        })
+      })
+
+      doc.end()
+      return reply
+    },
+  )
 }

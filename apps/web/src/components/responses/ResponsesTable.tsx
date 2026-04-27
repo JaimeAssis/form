@@ -17,8 +17,11 @@ export function ResponsesTable({
   if (responses.length === 0) {
     return (
       <div className="text-center py-16 border-2 border-dashed rounded-xl">
-        <p className="text-sm text-gray-500 mb-1">Nenhuma resposta recebida ainda.</p>
-        <p className="text-xs text-gray-400">Compartilhe o link do formulário para começar a receber respostas.</p>
+        <div className="text-4xl mb-3">📭</div>
+        <h3 className="font-medium text-gray-700 mb-1">Nenhuma resposta ainda</h3>
+        <p className="text-sm text-gray-400 mb-4">
+          Compartilhe o link do formulário para começar a receber respostas.
+        </p>
       </div>
     )
   }

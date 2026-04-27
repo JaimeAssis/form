@@ -32,9 +32,14 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const form = await getForm(params.slug)
   if (!form || form === 'paused') return { title: 'Formulário' }
+  const description = form.description || `Preencha o formulário ${form.title}`
   return {
     title: form.title,
-    description: form.description || `Preencha o formulário ${form.title}`,
+    description,
+    openGraph: {
+      title: form.title,
+      description,
+    },
   }
 }
 

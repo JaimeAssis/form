@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import type { Metadata } from 'next'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
@@ -21,7 +22,15 @@ async function getProfile(slug: string): Promise<PublicUser | null> {
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const user = await getProfile(params.slug)
   if (!user) return { title: 'Perfil não encontrado' }
-  return { title: `${user.name} — Consorte Form`, description: `Formulários de ${user.name}` }
+  const description = `Formulários de briefing de ${user.name}.`
+  return {
+    title: `${user.name} — Consorte Form`,
+    description,
+    openGraph: {
+      title: user.name,
+      description,
+    },
+  }
 }
 
 export default async function PublicProfilePage({ params }: { params: { slug: string } }) {

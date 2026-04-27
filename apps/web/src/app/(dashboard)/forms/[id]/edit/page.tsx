@@ -16,6 +16,7 @@ import {
   createQuestion, updateQuestion, deleteQuestion, reorderQuestions,
   getSubscription
 } from '@/lib/api'
+import { LivePreview } from '@/components/builder/LivePreview'
 import { QuestionCard } from '@/components/builder/QuestionCard'
 import { BrandCustomizer } from '@/components/builder/BrandCustomizer'
 import { QuestionEditor } from '@/components/builder/QuestionEditor'
@@ -26,6 +27,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useToast } from '@/components/ui/use-toast'
 import { ArrowLeft, Eye, Globe, PauseCircle } from 'lucide-react'
+import { trackEvent } from '@/lib/posthog'
 
 const DEBOUNCE_MS = 800
 const RETRY_DELAYS = [3000, 6000, 12000]
@@ -180,6 +182,7 @@ export default function BuilderPage() {
     try {
       const updated = await updateFormStatus(id, 'PUBLISHED')
       setForm(prev => prev ? { ...prev, status: updated.status, slug: updated.slug } : prev)
+      trackEvent('form_published', { formId: id, questionCount: form.questions?.length ?? 0 })
       setPublishModalOpen(true)
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Erro ao publicar'
@@ -239,8 +242,8 @@ export default function BuilderPage() {
         </div>
       </div>
 
-      {/* Dois painéis */}
-      <div className="flex flex-1 overflow-hidden">
+      {/* Painéis */}
+      <div className={`flex flex-1 overflow-hidden`}>
         {/* Painel esquerdo */}
         <div className="w-72 border-r flex flex-col bg-gray-50">
           <div className="flex-1 overflow-y-auto p-3 space-y-2">
@@ -297,6 +300,14 @@ export default function BuilderPage() {
               </div>
             </div>
           )}
+        </div>
+
+        {/* Painel de pré-visualização (Pro/Agência) */}
+        <div className="w-72 flex-shrink-0 overflow-hidden">
+          <LivePreview
+            question={selectedQuestion}
+            isPro={userPlan !== 'FREE'}
+          />
         </div>
       </div>
 
