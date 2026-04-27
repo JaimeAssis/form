@@ -6,6 +6,7 @@ import { getTemplates, createFormFromTemplate, createForm, TemplateSummary } fro
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/use-toast'
 import { ArrowLeft, Plus } from 'lucide-react'
+import { trackEvent } from '@/lib/posthog'
 
 const NICHE_ICONS: Record<string, string> = {
   influencer: '🎬',
@@ -35,9 +36,12 @@ export default function NewFormPage() {
   }, [])
 
   async function handleTemplate(templateId: string) {
+    const tpl = templates.find((t) => t.id === templateId)
+    trackEvent('template_selected', { templateSlug: tpl?.niche ?? templateId })
     setCreating(true)
     try {
       const form = await createFormFromTemplate(templateId)
+      trackEvent('form_created', { from: 'template', templateSlug: tpl?.niche ?? null })
       router.push(`/dashboard/forms/${form.id}/edit`)
     } catch {
       toast({ title: 'Erro ao criar formulário', variant: 'destructive' })
@@ -49,6 +53,7 @@ export default function NewFormPage() {
     setCreating(true)
     try {
       const form = await createForm({ title: 'Sem título' })
+      trackEvent('form_created', { from: 'scratch', templateSlug: null })
       router.push(`/dashboard/forms/${form.id}/edit`)
     } catch {
       toast({ title: 'Erro ao criar formulário', variant: 'destructive' })

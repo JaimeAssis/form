@@ -9,6 +9,7 @@ import {
   useElements,
 } from '@stripe/react-stripe-js'
 import { apiFetch, createOverageIntent, createOveragePack } from '@/lib/api'
+import { trackEvent } from '@/lib/posthog'
 import {
   Dialog,
   DialogContent,
@@ -72,6 +73,7 @@ function PaymentForm({ formId, responseId, onUnlocked, onError }: PaymentFormPro
 
       const unlocked = await pollForUnlock(formId, responseId)
       if (unlocked) {
+        trackEvent('overage_paid', { amount: 300, responseId })
         onUnlocked()
       } else {
         onError('Pagamento confirmado! A resposta será desbloqueada em instantes. Tente recarregar.')

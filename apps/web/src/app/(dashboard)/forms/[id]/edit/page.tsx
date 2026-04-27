@@ -26,6 +26,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useToast } from '@/components/ui/use-toast'
 import { ArrowLeft, Eye, Globe, PauseCircle } from 'lucide-react'
+import { trackEvent } from '@/lib/posthog'
 
 const DEBOUNCE_MS = 800
 const RETRY_DELAYS = [3000, 6000, 12000]
@@ -180,6 +181,7 @@ export default function BuilderPage() {
     try {
       const updated = await updateFormStatus(id, 'PUBLISHED')
       setForm(prev => prev ? { ...prev, status: updated.status, slug: updated.slug } : prev)
+      trackEvent('form_published', { formId: id, questionCount: form.questions?.length ?? 0 })
       setPublishModalOpen(true)
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Erro ao publicar'
