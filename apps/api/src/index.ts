@@ -1,3 +1,5 @@
+import { initSentry, Sentry } from './lib/sentry'
+initSentry()
 import Fastify from 'fastify'
 import cors from '@fastify/cors'
 import 'dotenv/config'
@@ -30,6 +32,13 @@ server.register(paymentRoutes)
 server.register(subscriptionRoutes)
 // webhookRoutes last: it overrides the JSON parser in its own scope for raw body access
 server.register(webhookRoutes)
+
+server.setErrorHandler((error, request, reply) => {
+  Sentry.captureException(error, {
+    extra: { userId: (request as any).userId },
+  })
+  reply.status(500).send({ error: 'Erro interno do servidor' })
+})
 
 const start = async () => {
   try {
