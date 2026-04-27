@@ -13,9 +13,11 @@ import {
 import { Form, Question, QuestionType } from '@consorte/types'
 import {
   getForm, updateForm, updateFormStatus,
-  createQuestion, updateQuestion, deleteQuestion, reorderQuestions
+  createQuestion, updateQuestion, deleteQuestion, reorderQuestions,
+  getSubscription
 } from '@/lib/api'
 import { QuestionCard } from '@/components/builder/QuestionCard'
+import { BrandCustomizer } from '@/components/builder/BrandCustomizer'
 import { QuestionEditor } from '@/components/builder/QuestionEditor'
 import { AddQuestionButton } from '@/components/builder/QuestionTypePicker'
 import { AutoSaveIndicator, SaveStatus } from '@/components/builder/AutoSaveIndicator'
@@ -41,6 +43,7 @@ export default function BuilderPage() {
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle')
   const [publishModalOpen, setPublishModalOpen] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [userPlan, setUserPlan] = useState<'FREE' | 'PRO' | 'AGENCY'>('FREE')
 
   const pendingFormSave = useRef<ReturnType<typeof setTimeout> | null>(null)
   const pendingQuestionSave = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map())
@@ -52,6 +55,7 @@ export default function BuilderPage() {
 
   useEffect(() => {
     getForm(id).then(f => { setForm(f); setLoading(false) }).catch(() => router.push('/dashboard/forms'))
+    getSubscription().then((s) => setUserPlan(s.plan)).catch(() => null)
   }, [id])
 
   const selectedQuestion = form?.questions.find(q => q.id === selectedId) ?? null
@@ -277,8 +281,20 @@ export default function BuilderPage() {
               />
             </>
           ) : (
-            <div className="flex items-center justify-center h-full">
-              <p className="text-sm text-gray-400">Selecione uma pergunta para editar</p>
+            <div className="flex flex-col h-full">
+              <p className="text-sm text-gray-400 text-center py-8">Selecione uma pergunta para editar</p>
+              <div className="mt-6 pt-6 border-t">
+                <h3 className="text-sm font-medium text-gray-700 mb-3">Personalização de marca</h3>
+                <BrandCustomizer
+                  brandColor={form.brandColor ?? ''}
+                  logoUrl={form.logoUrl ?? ''}
+                  isPro={userPlan === 'PRO' || userPlan === 'AGENCY'}
+                  onChange={(field, value) => {
+                    setForm(prev => prev ? { ...prev, [field]: value } : prev)
+                    scheduleFormSave({ [field]: value })
+                  }}
+                />
+              </div>
             </div>
           )}
         </div>
