@@ -154,3 +154,48 @@ export async function createOveragePack(): Promise<{ clientSecret: string }> {
     method: 'POST',
   })
 }
+
+// ─── Templates ────────────────────────────────────────────────────────────────
+
+export interface TemplateSummary {
+  id: string
+  niche: string
+  title: string
+  description: string
+  order: number
+}
+
+export async function getTemplates(): Promise<TemplateSummary[]> {
+  return apiFetch<TemplateSummary[]>('/templates')
+}
+
+export async function createFormFromTemplate(templateId: string): Promise<Form> {
+  return apiFetch<Form>('/forms', {
+    method: 'POST',
+    body: JSON.stringify({ templateId }),
+  })
+}
+
+// ─── Subscription ─────────────────────────────────────────────────────────────
+
+export interface SubscriptionInfo {
+  plan: 'FREE' | 'PRO' | 'AGENCY'
+  hasCustomer: boolean
+}
+
+export async function getSubscription(): Promise<SubscriptionInfo> {
+  return apiFetch<SubscriptionInfo>('/payments/subscription')
+}
+
+export async function createCheckoutSession(priceId: string): Promise<{ url: string }> {
+  return apiFetch<{ url: string }>('/payments/subscription/checkout', {
+    method: 'POST',
+    body: JSON.stringify({ priceId }),
+  })
+}
+
+export async function createPortalSession(): Promise<{ url: string }> {
+  return apiFetch<{ url: string }>('/payments/subscription/portal', {
+    method: 'POST',
+  })
+}
