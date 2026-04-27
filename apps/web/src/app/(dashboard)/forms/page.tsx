@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Form, FormStatus } from '@consorte/types'
-import { getForms, createForm, deleteForm, updateFormStatus } from '@/lib/api'
+import { getForms, deleteForm, updateFormStatus } from '@/lib/api'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/use-toast'
 import { Plus, Edit2, Copy, Trash2, Globe, PauseCircle, BarChart2 } from 'lucide-react'
@@ -31,12 +31,7 @@ export default function FormsPage() {
   }, [])
 
   async function handleCreate() {
-    try {
-      const form = await createForm({ title: 'Sem título' })
-      router.push(`/dashboard/forms/${form.id}/edit`)
-    } catch {
-      toast({ title: 'Erro ao criar formulário', variant: 'destructive' })
-    }
+    router.push('/dashboard/forms/new')
   }
 
   async function handleDelete(id: string) {
