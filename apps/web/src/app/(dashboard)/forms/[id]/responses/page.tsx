@@ -8,7 +8,9 @@ import { ResponsesTable } from '@/components/responses/ResponsesTable'
 import { ResponseDetail } from '@/components/responses/ResponseDetail'
 import { QuarantineModal } from '@/components/responses/QuarantineModal'
 import { Button } from '@/components/ui/button'
+import { useToast } from '@/components/ui/use-toast'
 import { ArrowLeft } from 'lucide-react'
+import { createClient } from '@/lib/supabase/client'
 
 interface QuarantinedTarget {
   id: string
@@ -19,6 +21,7 @@ interface QuarantinedTarget {
 export default function ResponsesPage() {
   const { id } = useParams<{ id: string }>()
   const router = useRouter()
+  const { toast } = useToast()
 
   const [responses, setResponses] = useState<ResponseSummary[]>([])
   const [meta, setMeta] = useState<ResponsesMeta | null>(null)
@@ -40,6 +43,33 @@ export default function ResponsesPage() {
   useEffect(() => {
     load()
   }, [load])
+
+  async function handleExportPdf() {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001'
+    const supabase = createClient()
+    const { data: { session } } = await supabase.auth.getSession()
+    const token = session?.access_token
+    if (!token) return
+
+    try {
+      const res = await fetch(`${apiUrl}/forms/${id}/responses/export/pdf`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      if (!res.ok) {
+        toast({ title: 'Erro ao exportar PDF', variant: 'destructive' })
+        return
+      }
+      const blob = await res.blob()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `respostas.pdf`
+      a.click()
+      URL.revokeObjectURL(url)
+    } catch {
+      toast({ title: 'Erro ao exportar PDF', variant: 'destructive' })
+    }
+  }
 
   function handleSelectQuarantined(responseId: string) {
     const r = responses.find((r) => r.id === responseId)
@@ -82,6 +112,21 @@ export default function ResponsesPage() {
           <ArrowLeft className="w-4 h-4 mr-1" /> Voltar ao editor
         </Button>
         <h1 className="text-lg font-semibold text-gray-800">Respostas</h1>
+        <div className="ml-auto flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleExportPdf}
+            disabled={!meta || (meta.plan !== 'PRO' && meta.plan !== 'AGENCY')}
+            title={
+              meta && meta.plan !== 'PRO' && meta.plan !== 'AGENCY'
+                ? 'Disponível no plano Pro'
+                : undefined
+            }
+          >
+            Exportar PDF
+          </Button>
+        </div>
       </div>
 
       {meta && (
