@@ -37,7 +37,8 @@ server.setErrorHandler((error, request, reply) => {
   Sentry.captureException(error, {
     extra: { userId: (request as any).userId },
   })
-  reply.status(500).send({ error: 'Erro interno do servidor' })
+  const statusCode = (error as any).statusCode ?? 500
+  reply.status(statusCode).send({ error: error.message || 'Erro interno do servidor' })
 })
 
 const start = async () => {
