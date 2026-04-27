@@ -42,7 +42,7 @@ export default function NewFormPage() {
     try {
       const form = await createFormFromTemplate(templateId)
       trackEvent('form_created', { from: 'template', templateSlug: tpl?.niche ?? null })
-      router.push(`/dashboard/forms/${form.id}/edit`)
+      router.push(`/forms/${form.id}/edit`)
     } catch {
       toast({ title: 'Erro ao criar formulário', variant: 'destructive' })
       setCreating(false)
@@ -54,7 +54,7 @@ export default function NewFormPage() {
     try {
       const form = await createForm({ title: 'Sem título' })
       trackEvent('form_created', { from: 'scratch', templateSlug: null })
-      router.push(`/dashboard/forms/${form.id}/edit`)
+      router.push(`/forms/${form.id}/edit`)
     } catch {
       toast({ title: 'Erro ao criar formulário', variant: 'destructive' })
       setCreating(false)

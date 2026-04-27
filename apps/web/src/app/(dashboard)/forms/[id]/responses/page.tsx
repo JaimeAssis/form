@@ -36,7 +36,7 @@ export default function ResponsesPage() {
         setResponses(r)
         setMeta(m)
       })
-      .catch(() => router.push(`/dashboard/forms/${id}/edit`))
+      .catch(() => router.push(`/forms/${id}/edit`))
       .finally(() => setLoading(false))
   }, [id, router])
 
@@ -107,7 +107,7 @@ export default function ResponsesPage() {
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => router.push(`/dashboard/forms/${id}/edit`)}
+          onClick={() => router.push(`/forms/${id}/edit`)}
         >
           <ArrowLeft className="w-4 h-4 mr-1" /> Voltar ao editor
         </Button>

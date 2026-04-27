@@ -31,7 +31,7 @@ export default function FormsPage() {
   }, [])
 
   async function handleCreate() {
-    router.push('/dashboard/forms/new')
+    router.push('/forms/new')
   }
 
   async function handleDelete(id: string) {
@@ -107,10 +107,10 @@ export default function FormsPage() {
                 </div>
 
                 <div className="flex items-center gap-1">
-                  <Button variant="ghost" size="sm" onClick={() => router.push(`/dashboard/forms/${form.id}/responses`)}>
+                  <Button variant="ghost" size="sm" onClick={() => router.push(`/forms/${form.id}/responses`)}>
                     <BarChart2 className="w-4 h-4" />
                   </Button>
-                  <Button variant="ghost" size="sm" onClick={() => router.push(`/dashboard/forms/${form.id}/edit`)}>
+                  <Button variant="ghost" size="sm" onClick={() => router.push(`/forms/${form.id}/edit`)}>
                     <Edit2 className="w-4 h-4" />
                   </Button>
                   {form.status === FormStatus.PUBLISHED && (
