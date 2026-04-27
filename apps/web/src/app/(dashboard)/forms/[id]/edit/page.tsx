@@ -16,6 +16,7 @@ import {
   createQuestion, updateQuestion, deleteQuestion, reorderQuestions,
   getSubscription
 } from '@/lib/api'
+import { LivePreview } from '@/components/builder/LivePreview'
 import { QuestionCard } from '@/components/builder/QuestionCard'
 import { BrandCustomizer } from '@/components/builder/BrandCustomizer'
 import { QuestionEditor } from '@/components/builder/QuestionEditor'
@@ -241,8 +242,8 @@ export default function BuilderPage() {
         </div>
       </div>
 
-      {/* Dois painéis */}
-      <div className="flex flex-1 overflow-hidden">
+      {/* Painéis */}
+      <div className={`flex flex-1 overflow-hidden`}>
         {/* Painel esquerdo */}
         <div className="w-72 border-r flex flex-col bg-gray-50">
           <div className="flex-1 overflow-y-auto p-3 space-y-2">
@@ -299,6 +300,14 @@ export default function BuilderPage() {
               </div>
             </div>
           )}
+        </div>
+
+        {/* Painel de pré-visualização (Pro/Agência) */}
+        <div className="w-72 flex-shrink-0 overflow-hidden">
+          <LivePreview
+            question={selectedQuestion}
+            isPro={userPlan !== 'FREE'}
+          />
         </div>
       </div>
 
