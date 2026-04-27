@@ -95,7 +95,7 @@ export async function questionRoutes(app: FastifyInstance) {
           include: { condition: true },
           orderBy: { order: 'asc' },
         })
-        const questionsForCheck = allQuestions.map(q => ({
+        const questionsForCheck = allQuestions.map((q: { id: string; condition: { triggerQuestionId: string } | null }) => ({
           id: q.id,
           condition: q.condition ? { triggerQuestionId: q.condition.triggerQuestionId } : null,
         }))

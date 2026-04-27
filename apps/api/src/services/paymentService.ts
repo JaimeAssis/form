@@ -93,7 +93,7 @@ export async function handlePaymentSucceeded(
       where: { userId: payment.userId },
       select: { id: true },
     })
-    const formIds = userForms.map((f) => f.id)
+    const formIds = userForms.map((f: { id: string }) => f.id)
     const quarantined = await prisma.response.findMany({
       where: { formId: { in: formIds }, status: 'QUARANTINED' },
       orderBy: { createdAt: 'asc' },
@@ -101,7 +101,7 @@ export async function handlePaymentSucceeded(
     })
     if (quarantined.length > 0) {
       await prisma.response.updateMany({
-        where: { id: { in: quarantined.map((r) => r.id) } },
+        where: { id: { in: quarantined.map((r: { id: string }) => r.id) } },
         data: { status: 'UNLOCKED' },
       })
     }

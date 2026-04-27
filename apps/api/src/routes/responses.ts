@@ -27,7 +27,7 @@ export async function responseRoutes(app: FastifyInstance) {
       where: { userId: request.userId },
       select: { id: true },
     })
-    const formIds = userForms.map((f) => f.id)
+    const formIds = userForms.map((f: { id: string }) => f.id)
 
     const [monthlyFreeUsed, quarantinedCount, accumulatedPayments] = await Promise.all([
       prisma.response.count({
@@ -88,8 +88,8 @@ export async function responseRoutes(app: FastifyInstance) {
       })
     }
 
-    const answersWithInfo = response.answers.map((a) => {
-      const q = form.questions.find((q) => q.id === a.questionId)
+    const answersWithInfo = response.answers.map((a: { questionId: string; value: string }) => {
+      const q = form.questions.find((fq: { id: string; title: string; type: string }) => fq.id === a.questionId)
       return {
         questionId: a.questionId,
         questionTitle: q?.title ?? 'Pergunta removida',
@@ -104,7 +104,7 @@ export async function responseRoutes(app: FastifyInstance) {
       respondentEmail: response.respondentEmail,
       createdAt: response.createdAt,
       status: response.status,
-      questions: form.questions.map((q) => ({
+      questions: form.questions.map((q: { id: string; title: string; type: string; order: number }) => ({
         id: q.id,
         title: q.title,
         type: q.type,
@@ -134,13 +134,13 @@ export async function responseRoutes(app: FastifyInstance) {
       })
       if (!form) return reply.status(404).send({ error: 'Formulário não encontrado' })
 
-      const headers = ['Data', 'Respondente', ...form.questions.map((q) => q.title)]
-      const rows = form.responses.map((r) => {
-        const answerMap = new Map(r.answers.map((a) => [a.questionId, a.value]))
+      const headers = ['Data', 'Respondente', ...form.questions.map((q: { title: string }) => q.title)]
+      const rows = form.responses.map((r: { createdAt: Date; respondentName: string | null; answers: { questionId: string; value: string }[] }) => {
+        const answerMap = new Map(r.answers.map((a: { questionId: string; value: string }) => [a.questionId, a.value]))
         return [
           new Date(r.createdAt).toLocaleString('pt-BR'),
           r.respondentName ?? 'Anônimo',
-          ...form.questions.map((q) => {
+          ...form.questions.map((q: { id: string }) => {
             const val = answerMap.get(q.id) ?? ''
             try {
               const parsed = JSON.parse(val)
@@ -154,8 +154,8 @@ export async function responseRoutes(app: FastifyInstance) {
       })
 
       const csvLines = [headers, ...rows]
-        .map((row) =>
-          row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(','),
+        .map((row: (string | undefined)[]) =>
+          row.map((cell: string | undefined) => `"${String(cell).replace(/"/g, '""')}"`).join(','),
         )
         .join('\r\n')
 
@@ -224,7 +224,7 @@ export async function responseRoutes(app: FastifyInstance) {
         return reply
       }
 
-      form.responses.forEach((response, idx) => {
+      form.responses.forEach((response: { respondentName: string | null; createdAt: Date; answers: { questionId: string; value: string }[] }, idx: number) => {
         if (idx > 0) doc.addPage()
 
         doc
@@ -239,9 +239,9 @@ export async function responseRoutes(app: FastifyInstance) {
           .text(`Recebida em ${new Date(response.createdAt).toLocaleString('pt-BR')}`)
         doc.moveDown(0.5)
 
-        const answerMap = new Map(response.answers.map((a) => [a.questionId, a.value]))
+        const answerMap = new Map(response.answers.map((a: { questionId: string; value: string }) => [a.questionId, a.value]))
 
-        form.questions.forEach((q) => {
+        form.questions.forEach((q: { id: string; title: string }) => {
           const raw = answerMap.get(q.id) ?? ''
           let value = raw
           try {
