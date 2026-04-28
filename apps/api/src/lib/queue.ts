@@ -2,16 +2,26 @@ import { Queue, Worker } from 'bullmq'
 import IORedis from 'ioredis'
 import { resend } from './resend'
 
-let connection: IORedis
+let connection: IORedis | null = null
 
-try {
-  connection = new IORedis(
-    process.env.UPSTASH_REDIS_REST_URL ?? 'redis://localhost:6379',
-    { maxRetriesPerRequest: null, lazyConnect: true },
-  )
-} catch {
-  // Redis não disponível em dev — fila vai falhar silenciosamente
-  connection = null as unknown as IORedis
+const redisUrl = process.env.REDIS_URL
+const isValidRedisUrl = redisUrl && /^rediss?:\/\//.test(redisUrl)
+
+if (isValidRedisUrl) {
+  try {
+    connection = new IORedis(redisUrl, {
+      maxRetriesPerRequest: null,
+      lazyConnect: true,
+    })
+    connection.on('error', (err) => {
+      console.error('[redis] connection error:', err.message)
+    })
+  } catch (err) {
+    console.warn('[redis] failed to initialize, queue disabled:', err)
+    connection = null
+  }
+} else {
+  console.warn('[redis] REDIS_URL not set or invalid — email queue disabled')
 }
 
 export const emailQueue = connection
