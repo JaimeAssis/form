@@ -1,11 +1,11 @@
 [build]
 builder = "nixpacks"
-buildCommand = "npm install && npm run build"
+buildCommand = "npm install && npm run build --workspace=apps/api"
 
 [deploy]
-startCommand = "npm run start"
+startCommand = "npm run start --workspace=apps/api"
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 3
 
 [environments.production.deploy]
-startCommand = "npx prisma migrate deploy --schema=prisma/schema.prisma && npm run start"
+startCommand = "npx prisma migrate deploy --schema=apps/api/prisma/schema.prisma && npm run start --workspace=apps/api"
