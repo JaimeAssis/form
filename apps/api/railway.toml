@@ -8,4 +8,4 @@ restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 3
 
 [environments.production.deploy]
-startCommand = "npx prisma migrate deploy --schema=apps/api/prisma/schema.prisma && npm run start --workspace=apps/api"
+startCommand = "npx prisma migrate deploy --schema=apps/api/prisma/schema.prisma && npm run db:seed --workspace=apps/api && npm run start --workspace=apps/api"
