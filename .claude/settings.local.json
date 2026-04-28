@@ -39,7 +39,17 @@
       "Bash(git push *)",
       "Bash(timeout 5 node dist/apps/api/src/index.js)",
       "Bash(echo \"exit=$?\")",
-      "Bash(grep -r \"import.*from.*\\\\\\\\.\\\\\\\\.\" /c/Users/JUNIOR/Documents/\"consorte from\"/apps/web/src --include=\"*.ts\" --include=\"*.tsx\")"
+      "Bash(grep -r \"import.*from.*\\\\\\\\.\\\\\\\\.\" /c/Users/JUNIOR/Documents/\"consorte from\"/apps/web/src --include=\"*.ts\" --include=\"*.tsx\")",
+      "Bash(curl -s http://localhost:3001/login)",
+      "Bash(curl -s http://localhost:3001/health)",
+      "Bash(taskkill /F /IM node.exe)",
+      "Bash(curl -s http://localhost:3004/health)",
+      "mcp__Claude_in_Chrome__tabs_context_mcp",
+      "mcp__Claude_in_Chrome__browser_batch",
+      "mcp__Claude_in_Chrome__navigate",
+      "mcp__Claude_in_Chrome__computer",
+      "Bash(curl -s http://localhost:3004/api/templates)",
+      "Bash(curl -s http://localhost:4000/health)"
     ]
   }
 }

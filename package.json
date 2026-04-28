@@ -3,7 +3,7 @@
   "private": true,
   "workspaces": ["apps/*", "packages/*"],
   "scripts": {
-    "dev": "concurrently \"npm run dev --workspace=apps/web\" \"npm run dev --workspace=apps/api\"",
+    "dev": "concurrently --names web,api \"cd apps/web && npm run dev\" \"cd apps/api && npm run dev\"",
     "build": "npm run build --workspace=apps/web && npm run build --workspace=apps/api",
     "lint": "npm run lint --workspace=apps/web && npm run lint --workspace=apps/api",
     "type-check": "npm run type-check --workspace=apps/web && npm run type-check --workspace=apps/api"
