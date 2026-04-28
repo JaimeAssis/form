@@ -15,8 +15,19 @@ import { webhookRoutes } from './routes/webhooks'
 
 const server = Fastify({ logger: true })
 
+const rawFrontendUrl = (process.env.FRONTEND_URL || 'http://localhost:3000').replace(/\/+$/, '')
+
 server.register(cors, {
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: (origin, callback) => {
+    // Allow requests with no Origin header (e.g. server-to-server, curl)
+    if (!origin) return callback(null, true)
+    // Strip trailing slash before comparing
+    const normalised = origin.replace(/\/+$/, '')
+    if (normalised === rawFrontendUrl) return callback(null, true)
+    // Allow localhost in any env (useful for local testing against production API)
+    if (/^https?:\/\/localhost(:\d+)?$/.test(normalised)) return callback(null, true)
+    return callback(new Error(`Origin ${origin} not allowed`), false)
+  },
   credentials: true,
 })
 
