@@ -43,7 +43,7 @@ if (connection) {
             <h2 style="color:#1a1a1a">Nova resposta recebida!</h2>
             <p>O formulário <strong>${formTitle}</strong> recebeu uma nova resposta
             ${respondentName ? `de <strong>${respondentName}</strong>` : ''}.</p>
-            <a href="${appUrl}/dashboard/forms/${formId}/responses/${responseId}"
+            <a href="${appUrl}/forms/${formId}/responses"
                style="display:inline-block;padding:12px 24px;background:#2563eb;color:#fff;text-decoration:none;border-radius:6px;margin-top:16px">
               Ver resposta →
             </a>

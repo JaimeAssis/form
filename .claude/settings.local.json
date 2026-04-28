@@ -36,7 +36,10 @@
       "mcp__Claude_Preview__preview_start",
       "Bash(grep -v \": //\")",
       "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(json.dumps\\(d.get\\('scripts',{}\\), indent=2\\)\\)\")",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "Bash(timeout 5 node dist/apps/api/src/index.js)",
+      "Bash(echo \"exit=$?\")",
+      "Bash(grep -r \"import.*from.*\\\\\\\\.\\\\\\\\.\" /c/Users/JUNIOR/Documents/\"consorte from\"/apps/web/src --include=\"*.ts\" --include=\"*.tsx\")"
     ]
   }
 }

@@ -236,7 +236,7 @@ export function QuarantineModal({
             </Button>
             {showProHint && (
               <Button variant="ghost" className="w-full text-xs text-gray-500" asChild>
-                <a href="/dashboard/upgrade">Ver plano Pro →</a>
+                <a href="/upgrade">Ver plano Pro →</a>
               </Button>
             )}
           </div>

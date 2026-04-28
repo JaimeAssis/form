@@ -43,7 +43,7 @@ export function OverageBanner({
       {showUpgradeHint && (
         <p className="mt-2 text-xs text-amber-700">
           Você está perto do valor do Pro. Assine por R$ 57/mês e libere tudo.{' '}
-          <a href="/dashboard/upgrade" className="underline font-medium">
+          <a href="/upgrade" className="underline font-medium">
             Ver planos
           </a>
         </p>

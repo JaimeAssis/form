@@ -16,7 +16,7 @@ export function BrandCustomizer({ brandColor, logoUrl, isPro, onChange }: BrandC
         <p className="text-sm text-gray-500">
           🔒 Personalização de marca disponível no plano <strong>Pro</strong>.
         </p>
-        <a href="/dashboard/upgrade" className="text-sm text-blue-600 hover:underline mt-1 inline-block">
+        <a href="/upgrade" className="text-sm text-blue-600 hover:underline mt-1 inline-block">
           Ver planos →
         </a>
       </div>

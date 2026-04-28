@@ -64,7 +64,7 @@ export default function NewFormPage() {
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <button
-        onClick={() => router.push('/dashboard/forms')}
+        onClick={() => router.push('/forms')}
         className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-800 mb-6"
       >
         <ArrowLeft className="w-4 h-4" /> Voltar
