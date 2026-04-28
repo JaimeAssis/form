@@ -72,7 +72,7 @@ export function LivePreview({ question, isPro }: LivePreviewProps) {
       <div className="flex flex-col items-center justify-center h-full p-6 text-center border-l bg-gray-50">
         <p className="text-sm font-medium text-gray-700 mb-1">Pré-visualização ao vivo</p>
         <p className="text-xs text-gray-400 mb-3">Disponível no plano Pro</p>
-        <a href="/dashboard/upgrade" className="text-xs text-blue-600 hover:underline">
+        <a href="/upgrade" className="text-xs text-blue-600 hover:underline">
           Fazer upgrade →
         </a>
       </div>

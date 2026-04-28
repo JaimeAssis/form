@@ -56,7 +56,7 @@ export default function BuilderPage() {
   )
 
   useEffect(() => {
-    getForm(id).then(f => { setForm(f); setLoading(false) }).catch(() => router.push('/dashboard/forms'))
+    getForm(id).then(f => { setForm(f); setLoading(false) }).catch(() => router.push('/forms'))
     getSubscription().then((s) => setUserPlan(s.plan)).catch(() => null)
   }, [id])
 
@@ -211,7 +211,7 @@ export default function BuilderPage() {
     <div className="flex flex-col h-[calc(100vh-64px)]">
       {/* Topbar */}
       <div className="flex items-center gap-3 px-4 py-3 border-b bg-white">
-        <Button variant="ghost" size="sm" onClick={() => router.push('/dashboard/forms')}>
+        <Button variant="ghost" size="sm" onClick={() => router.push('/forms')}>
           <ArrowLeft className="w-4 h-4 mr-1" /> Voltar
         </Button>
 
@@ -227,7 +227,7 @@ export default function BuilderPage() {
 
         <div className="ml-auto flex items-center gap-2">
           <AutoSaveIndicator status={saveStatus} />
-          <Button variant="outline" size="sm" onClick={() => window.open(`/api/forms/${id}/preview`, '_blank')}>
+          <Button variant="outline" size="sm" onClick={() => window.open(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/forms/${id}/preview`, '_blank')}>
             <Eye className="w-4 h-4 mr-1" /> Pré-visualizar
           </Button>
           {form.status === 'PUBLISHED' ? (
